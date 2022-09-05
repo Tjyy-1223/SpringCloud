@@ -16,4 +16,9 @@ SpringCloud+RabbitMQ+Docker+Redis+搜索+分布式，微服务技术栈学习
 
 + 服务拆分原则
 + 服务拆分demo实例
-+ 
++ 实现微服务之间的远程调用 - RestTemplate
++ 提供者和消费者
+
+#### 3 Eureka注册中心
+
++  Eureka的结构和作用
