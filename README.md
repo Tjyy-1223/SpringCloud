@@ -124,6 +124,20 @@ Nacos与Eureka的区别:
 
 + 从微服务中拉取配置 + 本地配置文件
 
+```
+SpringCloud 2.4版本之后不再优先读取bootstrap文件，导致bootstrap不起作用；需要在pom.xml文件中引入如下依赖后，就可以正常读取bootstrap.yml配置文件了
+
+<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-bootstrap</artifactId>
+    <version>3.0.2</version>
+</dependency>
+
+config:
+  file-extension: yaml # 文件后缀名
+  namespace: 9f97404c-51e3-4d6d-b4f7-3ed102069817
+```
+
 **注意：**配置文件的namespace要和启动文件的namespace相统一！！！不然会找不到配置文件中的配置
 
 + 配置热更新
@@ -139,3 +153,43 @@ public class PatternProperties {
     private String dateformat;
 }
 ```
+
++ 多环境配置共享
+
+在配置中添加 多环境配置共享属性值 ： pattern.envSharedValue
+
++ Nacos集群搭建
+
+
+
+#### 2 Http客户端FeignF
+
+Feign是一个声明式的http客户端，官方地址:https://github.com/OpenFeign/feign ，其作用就是帮助我们优雅的实现http请求的发送，解决上面提到的问题。
+
++ **Feign**替代**RestTemplate**
+
+1）引入依赖
+
+```
+ <dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-openfeign</artifactId>
+</dependency>
+```
+
+2）添加注解 - @EnableFeignClients
+
+3）编写Feign客户端
+
+```java
+@FeignClient("userservice")
+public interface UserClient {
+    @GetMapping("/user/{id}")
+    User findById(@PathVariable Long id);
+}
+```
+
+4）测试
+
++ 自定义配置
+

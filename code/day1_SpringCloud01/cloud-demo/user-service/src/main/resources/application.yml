@@ -6,10 +6,10 @@ spring:
     username: root
     password: 991116
     driver-class-name: com.mysql.jdbc.Driver
-#  cloud:
-#    nacos:
-#      discovery:
-#        namespace: 9f97404c-51e3-4d6d-b4f7-3ed102069817
+  cloud:
+    nacos:
+      discovery:
+        namespace: 0f5f7e8c-7704-4f33-a470-ca171eb75b9d
 #      discovery:
 #        cluster-name: SH
 mybatis:

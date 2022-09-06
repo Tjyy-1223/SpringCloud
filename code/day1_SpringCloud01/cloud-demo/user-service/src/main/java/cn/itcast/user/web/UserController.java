@@ -34,6 +34,11 @@ public class UserController {
         return LocalDateTime.now().format(DateTimeFormatter.ofPattern(properties.getDateformat()));
     }
 
+    @GetMapping("/prop")
+    public PatternProperties properties(){
+        return properties;
+    }
+
     /**
      * 路径： /user/110
      *
