@@ -6,13 +6,12 @@ spring:
     username: root
     password: 991116
     driver-class-name: com.mysql.jdbc.Driver
-  application:
-    name: userservice
-  cloud:
-    nacos:
-      server-addr: localhost:8848
-      discovery:
-        cluster-name: SH
+#  cloud:
+#    nacos:
+#      discovery:
+#        namespace: 9f97404c-51e3-4d6d-b4f7-3ed102069817
+#      discovery:
+#        cluster-name: SH
 mybatis:
   type-aliases-package: cn.itcast.user.pojo
   configuration:

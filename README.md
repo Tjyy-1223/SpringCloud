@@ -100,3 +100,42 @@ spring:
 
 + **Nacos**与**Eureka**的区别
 
+```
+Nacos与eureka的共同点:
+	都支持服务注册和服务拉取
+	都支持服务提供者心跳方式做健康检测
+	
+Nacos与Eureka的区别:
+	Nacos支持服务端主动检测提供者状态:临时实例采用心跳模式，非临时实例采用主动检测模式 
+	临时实例心跳不正常会被剔除，非临时实例则不会被剔除 
+	Nacos支持服务列表变更的消息推送模式，服务列表更新更及时 
+	Nacos集群默认采用AP方式，当集群中存在非临时实例时，采用CP模式;Eureka采用AP方式
+```
+
+
+
+### Day2 SpringCloud02
+
+#### 1 Nacos配置管理
+
++ 统一配置管理
+
+当微服务部署的实例越来越多，达到数十、数百时，逐个修改微服务配置就会让人抓狂，而且很容易出错。我们需要一种统一配置管理方案，可以集中管理所有实例的配置。
+
++ 从微服务中拉取配置 + 本地配置文件
+
+**注意：**配置文件的namespace要和启动文件的namespace相统一！！！不然会找不到配置文件中的配置
+
++ 配置热更新
+
+```
+在@Value注入的变量所在类上添加注解@RefreshScope
+
+使用@ConfigurationProperties注解代替@Value注解
+@Data
+@Component
+@ConfigurationProperties(prefix = "pattern")
+public class PatternProperties {
+    private String dateformat;
+}
+```
