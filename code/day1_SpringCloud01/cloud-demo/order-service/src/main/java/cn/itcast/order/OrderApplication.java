@@ -1,5 +1,6 @@
 package cn.itcast.order;
 
+import cn.itcast.feign.clients.UserClient;
 import com.netflix.loadbalancer.IRule;
 import com.netflix.loadbalancer.RandomRule;
 import org.mybatis.spring.annotation.MapperScan;
@@ -12,7 +13,7 @@ import org.springframework.web.client.RestTemplate;
 
 @MapperScan("cn.itcast.order.mapper")
 @SpringBootApplication
-@EnableFeignClients
+@EnableFeignClients(clients = {UserClient.class})
 public class OrderApplication {
 
     public static void main(String[] args) {

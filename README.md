@@ -162,7 +162,7 @@ public class PatternProperties {
 
 
 
-#### 2 Http客户端FeignF
+#### 2 Http客户端Feign
 
 Feign是一个声明式的http客户端，官方地址:https://github.com/OpenFeign/feign ，其作用就是帮助我们优雅的实现http请求的发送，解决上面提到的问题。
 
@@ -191,5 +191,55 @@ public interface UserClient {
 
 4）测试
 
-+ 自定义配置
++ 自定义Feign配置
+
+Feign运行自定义配置来覆盖默认配置，可以修改一些配置
+
+```
+ feign:
+  client:
+		config:
+			userservice: # 针对某个微服务的配置
+				loggerLevel: FULL # 日志级别
+```
+
++ Feign的性能优化
+
+提高Feign的性能主要手段就是使用连接池代替默认的URLConnection。
+
+1）引入依赖
+
+```
+<!--httpClient的依赖 --> 
+<dependency>
+    <groupId>io.github.openfeign</groupId>
+    <artifactId>feign-httpclient</artifactId>
+</dependency>
+```
+
+2)配置依赖池
+
+```
+feign:
+  httpclient:
+		enabled: true # 开启feign对HttpClient的支持 
+		max-connections: 200 # 最大的连接数 
+		max-connections-per-route: 50 # 每个路径的最大连接数
+```
+
++ Feign的最佳实践
+
+**分为继承方式和抽取方式**，其中比较常用的方式为抽取方式：
+
+将Feign的Client抽取为独立模块，并且把接口有关的POJO、默认的Feign配置都放到这个模块中，提供给所有消费者使用。例如，将UserClient、User、Feign的默认配置都抽取到一个feign-api包中，所有微服务引用该依赖包，即可直接使用。
+
+
+
+#### 3 统一网管GateWay
+
++ 为什么需要网关
+
+Gateway网关是我们服务的守⻔神，所有微服务的统一入口。 
+
+网关的核心功能特性:（1）请求路由 （2）权限控制  （3）限流
 
