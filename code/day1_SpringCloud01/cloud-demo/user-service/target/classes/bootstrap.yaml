@@ -2,7 +2,7 @@ spring:
   application:
     name: userservice # 服务名称
   profiles:
-    active: test
+    active: dev
   cloud:
     nacos:
       server-addr: localhost:8848 # Nacos地址

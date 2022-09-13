@@ -1,0 +1,27 @@
+server:
+  port: 10010
+spring:
+  application:
+    name: geteway
+  cloud:
+    nacos:
+      server-addr: localhost:8848
+      discovery:
+        namespace: 0f5f7e8c-7704-4f33-a470-ca171eb75b9d
+    gateway:
+      routes:
+        - id: user-service
+          uri: lb://userservice
+          predicates:
+            - Path=/user/**
+          filters:
+            - AddRequestHeader=Truth, Itcast is freaking awesome! # 添加请求头
+
+        - id: order-service
+          uri: lb://orderservice
+          predicates:
+            - Path=/order/**
+
+
+#      default-filters: # 默认过滤项
+#        - AddRequestHeader=Truth, Itcast is freaking awesome!

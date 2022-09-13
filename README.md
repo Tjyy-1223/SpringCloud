@@ -2,7 +2,7 @@
 
 SpringCloud+RabbitMQ+Docker+Redis+搜索+分布式，微服务技术栈学习
 
-### Day1 SpringCloud01
+## Day1 SpringCloud01
 
 #### 1 认识微服务
 
@@ -114,7 +114,7 @@ Nacos与Eureka的区别:
 
 
 
-### Day2 SpringCloud02
+## Day2 SpringCloud02
 
 #### 1 Nacos配置管理
 
@@ -239,7 +239,157 @@ feign:
 
 + 为什么需要网关
 
-Gateway网关是我们服务的守⻔神，所有微服务的统一入口。 
+Gateway网关是我们服务的守⻔神，所有微服务的统一入口。 网关的核心功能特性:
 
-网关的核心功能特性:（1）请求路由 （2）权限控制  （3）限流
+**请求路由和负载均衡：**一切请求都必须先经过gateway，但网关不处理业务，而是根据某种规则，把请求转发到某个微服务，这个过程叫做路由。当然路由的目标服务有多个时，还需要做负载均衡。
+
+**权限控制：**网关作为微服务入口，需要校验用户是是否有请求资格，如果没有则进行拦截。
+
+**限流：**当请求流量过高时，在网关中按照下流的微服务能够接受的速度来放行请求，避免服务压力过大。
+
++ GateWay快速入门
+
+**基本步骤如下:**
+
+1. 创建SpringBoot工程gateway，引入网关依赖 
+2. 编写启动类
+3. 编写基础配置和路由规则
+4. 启动网关服务进行测试
+
+```
+server:
+  port: 10010
+spring:
+  application:
+    name: geteway
+  cloud:
+    nacos:
+      server-addr: localhost:8848
+      discovery:
+        namespace: 0f5f7e8c-7704-4f33-a470-ca171eb75b9d
+    gateway:
+      routes:
+        - id: user-service
+          uri: lb://userservice
+          predicates:
+            - Path=/user/**
+        - id: order-service
+          uri: lb://orderservice
+          predicates:
+            - Path=/order/**
+```
+
++ 路由断言工厂 Route Predicate Factory
+
+我们在配置文件中写的断言规则只是字符串，这些字符串会被Predicate Factory读取并处理，转变为路由判断的条件
+
++ 过滤器工厂
+
+GatewayFilter是网关中提供的一种过滤器，可以对进入网关的请求和微服务返回的响应做处理:
+
+过滤器的作用是什么?
+
+1）对路由的请求或响应做加工处理，比如添加请求头 
+
+2）配置在路由下的过滤器只对当前路由的请求生效 
+
+defaultFilters的作用是什么?	
+
+1）对所有路由都生效的过滤器
+
++ 全局过滤器
+
+全局过滤器的作用也是处理一切进入网关的请求和微服务响应，与GatewayFilter的作用一样。区别在于GatewayFilter通过配置定义，处理逻辑是固定的;而GlobalFilter的逻辑需要自己写代码实现。**定义方式是实现GlobalFilter接口：**
+
+```java
+@Order(-1)
+@Component
+public class AuthorizeFilter implements GlobalFilter {
+
+    @Override
+    public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
+        // 1 获取请求参数
+        ServerHttpRequest request = exchange.getRequest();
+        MultiValueMap<String, String> params = request.getQueryParams();
+        // 2  获取auth参数
+        String auth = params.getFirst("authorization");
+        // 3 判断参数是否等于admin
+        if("admin".equals(auth)){
+            // 4 是 执行
+            return chain.filter(exchange);
+        }
+        // 5 否 拦截
+        exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
+        return exchange.getResponse().setComplete();
+    }
+}
+```
+
++ 过滤器执行顺序
+
+请求路由后，会将当前路由过滤器和DefaultFilter、GlobalFilter，合并到一个过滤器链(集合)中，排序后依次执行每个过滤器:当过滤器的order值一样时，会按照 defaultFilter > 路由过滤器 > GlobalFilter的顺序执行。
+
++ 跨域配置
+
+**跨域问题: **    **浏览器**禁止请求的发起者与服务端发生跨域ajax请求，请求被浏览器拦截的问题。
+
+```
+spring:
+  cloud:
+		gateway: 
+			# 。。。
+			globalcors: # 全局的跨域处理
+				add-to-simple-url-handler-mapping: true # 解决options请求被拦截问题 
+				corsConfigurations:
+					'[/**]':
+					allowedOrigins: # 允许哪些网站的跨域请求
+						- "http://localhost:8090" allowedMethods: # 允许的跨域ajax的请求方式
+              - "GET"
+              - "POST"
+              - "DELETE"
+              - "PUT"
+              - "OPTIONS"
+          allowedHeaders: "*" # 允许在请求中携带的头信息
+          allowCredentials: true # 是否允许携带cookie 
+          maxAge: 360000 # 这次跨域检测的有效期
+```
+
+
+
+## Day3 Docker
+
+### 1 初识Docker
+
+#### 什么是Docker
+
++ Docker将用户程序与所需要调用的系统(比如Ubuntu)函数库一起打包
++ Docker运行到不同操作系统时，直接基于打包的函数库，借助于操作系统的Linux内核来运行
+
+问题：
+
+Docker如何解决大型项目依赖关系复杂，不同组件依赖的兼容性问题?
+
+Docker如何解决开发、测试、生产环境有差异的问题?
+
+Docker是一个快速交付应用、运行应用的技术，具备优势？
+
+
+
+#### Docker与虚拟机的区别
+
+**虚拟机：**模拟硬件设备，然后再运行另一个操作系统，应用调用内置操作系统，与Hypervisor与外部环境交互，性能较差
+
+**Docker：**封装函数库，并没有模拟完整的操作系统
+
++ docker是一个系统进程;虚拟机是在操作系统中的操作系统 
+
++ docker体积小、启动速度快、性能好;虚拟机体积大、启动速度慢、性能一般
+
+
+
+#### **Docker**架构
+
+**镜像(Image):**Docker将应用程序及其所需的依赖、函数库、环境、配置等文件打包在一起，称为镜像。
+
+**容器(Container):**镜像中的应用程序运行后形成的进程就是容器，只是Docker会给容器进程做隔离，对外不可⻅。
 
