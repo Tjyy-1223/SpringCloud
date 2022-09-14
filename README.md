@@ -358,9 +358,9 @@ spring:
 
 ## Day3 Docker
 
-### 1 初识Docker
+#### 1 初识Docker
 
-#### 什么是Docker
+**什么是Docker**
 
 + Docker将用户程序与所需要调用的系统(比如Ubuntu)函数库一起打包
 + Docker运行到不同操作系统时，直接基于打包的函数库，借助于操作系统的Linux内核来运行
@@ -375,7 +375,7 @@ Docker是一个快速交付应用、运行应用的技术，具备优势？
 
 
 
-#### Docker与虚拟机的区别
+**Docker与虚拟机的区别**
 
 **虚拟机：**模拟硬件设备，然后再运行另一个操作系统，应用调用内置操作系统，与Hypervisor与外部环境交互，性能较差
 
@@ -387,9 +387,93 @@ Docker是一个快速交付应用、运行应用的技术，具备优势？
 
 
 
-#### **Docker**架构
+**Docker架构**
 
 **镜像(Image):**Docker将应用程序及其所需的依赖、函数库、环境、配置等文件打包在一起，称为镜像。
 
 **容器(Container):**镜像中的应用程序运行后形成的进程就是容器，只是Docker会给容器进程做隔离，对外不可⻅。
+
+Docker是一个CS架构的程序，由两部分组成:
+
+**服务端(server):**Docker守护进程，负责处理Docker指令，管理镜像、容器等 
+
+**客户端(client):**通过命令或RestAPI向Docker服务端发送指令。可以在本地或远程向服务端发送指令。
+
+
+
+
+
+#### 2 Docker的基本操作
+
+**镜像操作**
+
+```
+docker build 构建镜像
+docker pull 拉取镜像
+docker rmi 删除镜像
+docker push 推送镜像
+docker save 保存镜像为一个压缩包
+docker load 加载压缩包成为镜像
+```
+
+**docker 运行nginx的案例**
+
+```
+拉取nginx镜像：
+docker pull nginx
+
+查看目前拥有的镜像：
+docker images
+```
+
+
+
+**容器相关操作**
+
+容器保护三个状态:
+
++ 运行:进程正常运行 
++ 暂停:进程暂停，CPU不再运行，并不释放内存 
++ 停止:进程终止，回收进程占用的内存、CPU等资源
+
+```
+docker run:创建并运行一个容器，处于运行状态 
+docker pause:让一个运行的容器暂停
+docker unpause:让一个容器从暂停状态恢复运行 
+docker stop:停止一个运行的容器
+docker start:让一个停止的容器再次运行 
+docker rm:删除一个容器
+```
+
+```
+nginx容器的运行命令：
+docker run --name containerName -p 80:80 -d nginx
+
+如何在容器中运行代码：案例 - 进入Nginx容器，修改HTML文件内容，添加“tjyy hello”
+进入容器：docker exec -it mn bash
+进入目录: cd /usr/share/nginx/html
+修改： sed -i -e 's#Welcome to nginx#传智教育欢迎您#g' -e 's#<head>#<head><meta charset="utf- 8">#g' index.html
+停止：docker stop mn
+
+redis:docker run --name mr -p 6379:6379 -d redis redis-server --appendonly yes
+```
+
+
+
+**数据卷：**
+
+在之前的nginx案例中，修改nginx的html⻚面时，需要进入nginx内部。并且因为没有编辑器，修改文件也很麻烦。这就是因为容器与数据(容器内文件)耦合带来的后果。
+
+**数据卷(volume)**是一个虚拟目录，指向宿主机文件系统中的某个目录;一旦完成数据卷挂载，对容器的一切操作都会作用在数据卷对应的宿主机目录了。
+
+**数据卷操作命令：**
+
+```
+docker volume [COMMAND]
+	create 创建一个volume
+	inspect 显示一个或多个volume的信息 
+	ls 列出所有的volume
+	prune 删除未使用的volume
+	rm 删除一个或多个指定的volume
+```
 
