@@ -31,5 +31,6 @@ public class AuthorizeFilter implements GlobalFilter {
         // 5 否 拦截
         exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
         return exchange.getResponse().setComplete();
+        
     }
 }
